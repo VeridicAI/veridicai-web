@@ -19,13 +19,13 @@ export default function VeridicAIInterface() {
         },
         body: JSON.stringify({
           prompt: prompt,
-          max_tokens: 500,
+          max_tokens: 800,
           temperature: 0.7,
         }),
       });
 
       const data = await res.json();
-      const completion = data?.choices?.[0]?.text || "[No response]";
+      const completion = data.choices?.[0]?.text || "[No response]";
       setResponse(completion.trim());
     } catch (err) {
       console.error("Error:", err);
@@ -42,27 +42,26 @@ export default function VeridicAIInterface() {
         <form onSubmit={handleSubmit} className="mb-4">
           <textarea
             className="w-full p-4 rounded bg-zinc-800 border border-zinc-600 text-white focus:outline-none"
-            rows={4}
+            rows={10}
             placeholder="Enter your VeridicAI prompt here..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-          ></textarea>
+          />
           <button
             type="submit"
-            className="mt-4 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 rounded shadow disabled:opacity-50"
+            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
             disabled={loading}
           >
-            {loading ? "Processing..." : "Ask VeridicAI"}
+            {loading ? "Thinking..." : "Submit"}
           </button>
         </form>
         {response && (
-          <div className="bg-zinc-900 p-4 rounded border border-zinc-700 whitespace-pre-wrap">
-            <strong className="text-indigo-400">Response:</strong>
-            <p className="mt-2">{response}</p>
+          <div className="bg-zinc-900 p-4 rounded mt-4 whitespace-pre-wrap">
+            <h2 className="text-xl font-semibold mb-2">Response:</h2>
+            <p>{response}</p>
           </div>
         )}
       </div>
     </div>
   );
 }
-
