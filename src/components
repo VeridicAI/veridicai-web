@@ -1,1 +1,68 @@
+import { useState } from "react";
+
+export default function VeridicAIInterface() {
+  const [prompt, setPrompt] = useState("");
+  const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!prompt.trim()) return;
+    setLoading(true);
+    setResponse("");
+
+    try {
+      const res = await fetch("http://localhost:1234/v1/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          max_tokens: 500,
+          temperature: 0.7,
+        }),
+      });
+
+      const data = await res.json();
+      const completion = data?.choices?.[0]?.text || "[No response]";
+      setResponse(completion.trim());
+    } catch (err) {
+      console.error("Error:", err);
+      setResponse("Error contacting VeridicAI backend.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-white p-6 flex flex-col items-center justify-center">
+      <div className="max-w-3xl w-full">
+        <h1 className="text-3xl font-bold mb-6 text-center">VeridicAI Web Interface</h1>
+        <form onSubmit={handleSubmit} className="mb-4">
+          <textarea
+            className="w-full p-4 rounded bg-zinc-800 border border-zinc-600 text-white focus:outline-none"
+            rows={4}
+            placeholder="Enter your VeridicAI prompt here..."
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+          ></textarea>
+          <button
+            type="submit"
+            className="mt-4 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 rounded shadow disabled:opacity-50"
+            disabled={loading}
+          >
+            {loading ? "Processing..." : "Ask VeridicAI"}
+          </button>
+        </form>
+        {response && (
+          <div className="bg-zinc-900 p-4 rounded border border-zinc-700 whitespace-pre-wrap">
+            <strong className="text-indigo-400">Response:</strong>
+            <p className="mt-2">{response}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
